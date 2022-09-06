@@ -10,8 +10,9 @@
 var key;
 var value;
 var Keyname;
-var Keyname;
 const arrayToMap = new Map();
+var arrStorage = new Array();
+var resultmap = new Array();
 var cnt;
 
 
@@ -47,47 +48,50 @@ $(function(){
 
 function showStorge(){
 	
-	//내용보기
-	for(var i =0; i < localStorage.length; i++){
-	   arrayToMap.set(localStorage.key(i), localStorage.getItem(localStorage.key(i)));
-	}
-	
-	var mapToArray = [...arrayToMap];
-	mapToArray = mapToArray.sort((a, b) => b[1] - a[1]);
-	console.log(mapToArray);
-	//alert(mapToArray.length);
-	if(mapToArray.length > 10){
-		cnt = 10;
-	} else {
-		cnt = mapToArray.length;
-	}
-	
+	if(localStorage.length > 0){
+		//내용보기
+		for(var i =0; i < localStorage.length; i++){
+		   arrayToMap.set(localStorage.key(i), localStorage.getItem(localStorage.key(i)));
+		}
 
-	for(let i = 0; i <= cnt; i++) {
-
-	var resultmap = mapToArray[i];
-	createDiv(resultmap[0]);
-	//alert(resultmap[0]);
+		console.log(arrayToMap);
+		var mapToArray = [...arrayToMap];
+		mapToArray = mapToArray.sort();
+		console.log(mapToArray);
+		if(mapToArray.length > 10){
+			cnt = 10;
+		} else {
+			cnt = mapToArray.length;
+		}
+		
 	
+		for(let i = 0; i < cnt; i++) {
+	
+		resultmap = mapToArray[i];
+		
+
+		console.log(resultmap);
+		key = resultmap[0];
+		value = resultmap[1];
+		console.log("key", key, "value", value);
+		
+		createDiv(key, value);
+		
+		}
 	}
 }
 
 
-function createDiv(word) {
-	  const newDiv = document.createElement('div');
-	  const newText = document.createTextNode(word);
-	  newDiv.appendChild(newText);
-	  document.getElementById("box").appendChild(newDiv);
-
-	  newDiv.setAttribute("class","myDiv");
-	  newDiv.style.backgroundColor="yellow";
+function createDiv(key, value) {
+	 var html = '';
+	 html += '<div id="storagePa'+key+'" style="display: flex; margin-bottom: 5px;"><div style="display: flex; width: 100px;">' + value + '</div><div style="display: flex; width: 50px;" id="storage'+key+'">X</div></div>';
+	 $('#box').prepend(html);
 	} 
 
 function inputStorage(){
-	//alert(localStorage.length);
 	
-	value = date();
-	key = $("#inputBox").val();
+	key = date();
+	value = $("#inputBox").val();
 	
 	 localStorage.setItem(key, value);
 }
@@ -95,9 +99,15 @@ function inputStorage(){
 function date(){
 	const now = new Date();
 	value = String(now.getFullYear()) + String(now.getMonth()) + String(now.getDate()) + String(now.getHours()) + String(now.getMinutes()) + String(now.getSeconds());
-	//alert(value);
 	return value;
 }
+
+$(document).on("click", "#box", function(e){
+	var storageId= e.target.id.replace('storage','');
+	var paranetId = 'storagePa' + storageId;
+	$('#'+paranetId).css( "display", "none" );
+	localStorage.removeItem(storageId);
+});
 </script>
 </head>
 <body>
@@ -106,7 +116,7 @@ function date(){
 <button id="deleteAllBtn">전체삭제</button>
 <button id="showBtn">내용보기</button>
 
-<input type="text" id="inputBox"">
+<input type="text" id="inputBox">
 <button id="saveInputBtn" onClick="inputStorage()">저장</button>
 <button id="showInputBtn" onClick="showStorge()">내용보기</button>
 <div id="box">박스여기</div>
