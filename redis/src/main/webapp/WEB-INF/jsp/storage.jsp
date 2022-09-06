@@ -10,12 +10,9 @@
 var key;
 var value;
 var Keyname;
+var Keyname;
 const arrayToMap = new Map();
-var arrStorage = new Array();
-var resultmap = new Array();
 var cnt;
-
-
 $(function(){
 	//저장
 	$('#saveBtn').click(function(){
@@ -38,6 +35,7 @@ $(function(){
 	//전체삭제
 	$('#deleteAllBtn').click(function(){
 		localStorage.clear(); //localStorage에 있는 모든 내용을 삭제... 주의해서 사용!
+		document.getElementById("box").innerText = '';
 	});
 	
 	//내용보기
@@ -45,69 +43,72 @@ $(function(){
 		alert(localStorage.getItem("key1")+","+localStorage.key2+","+localStorage["key3"]);
 	});
 });
-
 function showStorge(){
-	
+
 	if(localStorage.length > 0){
 		//내용보기
 		for(var i =0; i < localStorage.length; i++){
 		   arrayToMap.set(localStorage.key(i), localStorage.getItem(localStorage.key(i)));
 		}
-
-		console.log(arrayToMap);
+		
 		var mapToArray = [...arrayToMap];
-		mapToArray = mapToArray.sort();
+		mapToArray = mapToArray.sort((a, b) => b[1] - a[1]);
 		console.log(mapToArray);
+		//alert(mapToArray.length);
 		if(mapToArray.length > 10){
 			cnt = 10;
 		} else {
 			cnt = mapToArray.length;
 		}
 		
-	
 		for(let i = 0; i < cnt; i++) {
-	
-		resultmap = mapToArray[i];
-		
-
-		console.log(resultmap);
-		key = resultmap[0];
-		value = resultmap[1];
-		console.log("key", key, "value", value);
-		
-		createDiv(key, value);
+		var resultmap = mapToArray[i];
+		createDiv(resultmap[0], resultmap[1]);
+		//alert(resultmap[0]);
 		
 		}
 	}
 }
-
-
 function createDiv(key, value) {
-	 var html = '';
-	 html += '<div id="storagePa'+key+'" style="display: flex; margin-bottom: 5px;"><div style="display: flex; width: 100px;">' + value + '</div><div style="display: flex; width: 50px;" id="storage'+key+'">X</div></div>';
-	 $('#box').prepend(html);
+    const item = document.createElement("li");
+    const span = document.createElement("span");
+    const button = document.createElement("button");
+    item.id = 'storagePa' + value;
+    span.id = 'storage' + value;
+    span.innerText = key;
+    button.innerText = 'x';
+    button.addEventListener("click", deleteSto);
+    item.appendChild(span);
+    item.appendChild(button);
+  	document.getElementById("box").appendChild(item);
+    
 	} 
+	
+
+
+function deleteSto(e) { 	
+	key = e.target.parentElement.innerText;
+	key = key.substring(0, key.length-1);
+	localStorage.removeItem(key);
+	
+    const li = e.target.parentElement;
+    li.remove();
+};
 
 function inputStorage(){
+	//alert(localStorage.length);
 	
-	key = date();
-	value = $("#inputBox").val();
+	value = date();
+	key = $("#inputBox").val();
 	
 	 localStorage.setItem(key, value);
 }
-
 function date(){
 	const now = new Date();
 	value = String(now.getFullYear()) + String(now.getMonth()) + String(now.getDate()) + String(now.getHours()) + String(now.getMinutes()) + String(now.getSeconds());
+	//alert(value);
 	return value;
 }
-
-$(document).on("click", "#box", function(e){
-	var storageId= e.target.id.replace('storage','');
-	var paranetId = 'storagePa' + storageId;
-	$('#'+paranetId).css( "display", "none" );
-	localStorage.removeItem(storageId);
-});
 </script>
 </head>
 <body>
@@ -119,6 +120,6 @@ $(document).on("click", "#box", function(e){
 <input type="text" id="inputBox">
 <button id="saveInputBtn" onClick="inputStorage()">저장</button>
 <button id="showInputBtn" onClick="showStorge()">내용보기</button>
-<div id="box">박스여기</div>
+<div id="box"></div>
 </body>
 </html>
